@@ -1,0 +1,20 @@
+{
+ "actions": [
+   {
+     "description": "Launch intent",
+     "name": "MAIN",
+     "fulfillment": {
+       "conversationName": "mainConversation"
+     },
+     "intent": {
+       "name": "actions.intent.MAIN"
+     }
+   }
+ ],
+ "conversations": {
+   "mainConversation": {
+     "name": "mainConversation",
+     "url": "YOUR_HTTP_URL",
+   }
+ }
+}
