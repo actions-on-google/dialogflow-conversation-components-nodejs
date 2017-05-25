@@ -15,6 +15,7 @@
    "mainConversation": {
      "name": "mainConversation",
      "url": "YOUR_HTTP_URL",
+     "fulfillmentApiVersion": 2
    }
  }
 }
