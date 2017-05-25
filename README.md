@@ -1,4 +1,4 @@
-# Actions on Google Conversation Component Sample
+# Actions on Google: Conversation Component Sample
 
 A simple sample showing the visual conversation components available with Actions on Google.
 
