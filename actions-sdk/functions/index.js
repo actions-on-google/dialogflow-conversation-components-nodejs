@@ -14,20 +14,8 @@
 'use strict';
 
 process.env.DEBUG = 'actions-on-google:*';
-let ApiAiApp = require('actions-on-google').ApiAiApp;
-
-// Constants for API.AI Agent Actions
-const NORMAL_ASK = 'normal.ask';
-const NORMAL_BYE = 'normal.bye';
-const BYE_RESPONSE = 'bye.response';
-const BYE_CARD = 'bye.card';
-const WELCOME = 'input.welcome';
-const BASIC_CARD = 'basic.card';
-const LIST = 'list';
-const CAROUSEL = 'carousel';
-const SUGGESTIONS = 'suggestions';
-const ITEM_SELECTED = 'item.selected';
-const CARD_BUILDER = 'card.builder';
+let ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
+const functions = require('firebase-functions');
 
 // Constants for list and carousel selection
 const SELECTION_KEY_ONE = 'title';
@@ -44,8 +32,8 @@ const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
   '/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png';
 const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 
-exports.conversationComponent = (req, res) => {
-  const app = new ApiAiApp({request: req, response: res});
+exports.conversationComponent = functions.https.onRequest((req, res) => {
+  const app = new ActionsSdkApp({request: req, response: res});
   console.log('Request headers: ' + JSON.stringify(req.headers));
   console.log('Request body: ' + JSON.stringify(req.body));
 
@@ -83,18 +71,19 @@ exports.conversationComponent = (req, res) => {
       .addSuggestions(
         ['Basic Card', 'List', 'Carousel', 'Suggestions'])
         // Create a basic card and add it to the rich response
-      .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
-      basic card can include "quotes" and most other unicode characters 
-      including emoji 📱.  Basic cards also support some markdown 
-      formatting like *emphasis* or _italics_, **strong** or __bold__, 
-      and ***bold itallic*** or ___strong emphasis___ as well as other things
-      like line  \nbreaks`) // Note the two spaces before '\n' required for a
-                            // line break to be rendered in the card
-        .setSubtitle('This is a subtitle')
-        .setTitle('Title: this is a title')
-        .addButton('This is a button', 'https://assistant.google.com/')
-        .setImage(IMG_URL_AOG, 'Image alternate text'))
-      .addSimpleResponse({ speech: 'This is the 2nd simple response ',
+        .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
+        basic card can include "quotes" and most other unicode characters 
+        including emoji 📱.  Basic cards also support some markdown 
+        formatting like *emphasis* or _italics_, **strong** or __bold__, 
+        and ***bold itallic*** or ___strong emphasis___ as well as other things
+        like line  \nbreaks`) // Note the two spaces before '\n' required for a
+                              // line break to be rendered in the card
+          .setSubtitle('This is a subtitle')
+          .setTitle('Title: this is a title')
+          .addButton('This is a button', 'https://assistant.google.com/')
+          .setImage(IMG_URL_AOG, 'Image alternate text')
+        )
+      .addSimpleResponse({ speech: 'This is the second simple response ',
         displayText: 'This is the 2nd simple response' })
     );
   }
@@ -117,8 +106,8 @@ exports.conversationComponent = (req, res) => {
         .addItems(app.buildOptionItem(SELECTION_KEY_GOOGLE_HOME,
           ['Google Home Assistant', 'Assistant on the Google Home'])
           .setTitle('Google Home')
-          .setDescription('Google Home is a voice-activated speaker powered ' +
-            'by the Google Assistant.')
+          .setDescription(`Google Home is a voice-activated speaker powered by
+            the Google Assistant.`)
           .setImage(IMG_URL_GOOGLE_HOME, 'Google Home')
         )
         // Add third item to the list
@@ -131,7 +120,7 @@ exports.conversationComponent = (req, res) => {
         // Add last item of the list
         .addItems(app.buildOptionItem(SELECTION_KEY_GOOGLE_ALLO, [])
           .setTitle('Google Allo')
-          .setDescription('Introducing Google Allo, a smart messaging app ' +
+          .setDescription('Introducing Google Allo, a smart messaging app' +
             'that helps you say more and do more.')
           .setImage(IMG_URL_GOOGLE_ALLO, 'Google Allo Logo')
           .addSynonyms('Allo')
@@ -156,8 +145,8 @@ exports.conversationComponent = (req, res) => {
         .addItems(app.buildOptionItem(SELECTION_KEY_GOOGLE_HOME,
           ['Google Home Assistant', 'Assistant on the Google Home'])
           .setTitle('Google Home')
-          .setDescription('Google Home is a voice-activated speaker powered ' +
-            'by the Google Assistant.')
+          .setDescription(`Google Home is a voice-activated speaker powered by
+            the Google Assistant.`)
           .setImage(IMG_URL_GOOGLE_HOME, 'Google Home')
         )
         // Add third item to the carousel
@@ -170,7 +159,7 @@ exports.conversationComponent = (req, res) => {
         // Add last item of the carousel
         .addItems(app.buildOptionItem(SELECTION_KEY_GOOGLE_ALLO, [])
           .setTitle('Google Allo')
-          .setDescription('Introducing Google Allo, a smart messaging app ' +
+          .setDescription('Introducing Google Allo, a smart messaging app' +
             'that helps you say more and do more.')
           .setImage(IMG_URL_GOOGLE_ALLO, 'Google Allo Logo')
           .addSynonyms('Allo')
@@ -197,21 +186,6 @@ exports.conversationComponent = (req, res) => {
     }
   }
 
-  // Recive a rich response from API.AI and modify it
-  function cardBuilder (app) {
-    app.ask(app.getIncomingRichResponse()
-      .addBasicCard(app.buildBasicCard(`Actions on Google let you build for
-       the Google Assistant. Reach users right when they need you. Users don’t
-       need to pre-enable skills or install new apps.  \n  \nThis was written 
-       in the fulfillment webhook!`)
-        .setSubtitle('Engage users through the Google Assistant')
-        .setTitle('Actions on Google')
-        .addButton('Developer Site', 'https://developers.google.com/actions/')
-        .setImage('https://lh3.googleusercontent.com/Z7LtU6hhrhA-5iiO1foAfGB' +
-          '75OsO2O7phVesY81gH0rgQFI79sjx9aRmraUnyDUF_p5_bnBdWcXaRxVm2D1Rub92' +
-          'L6uxdLBl=s1376', 'Actions on Google')));
-  }
-
   // Leave conversation with card
   function byeCard (app) {
     app.tell(app.buildRichResponse()
@@ -230,18 +204,34 @@ exports.conversationComponent = (req, res) => {
     app.tell('Okay see you later!');
   }
 
-  const actionMap = new Map();
-  actionMap.set(WELCOME, welcome);
-  actionMap.set(NORMAL_ASK, normalAsk);
-  actionMap.set(BASIC_CARD, basicCard);
-  actionMap.set(LIST, list);
-  actionMap.set(ITEM_SELECTED, itemSelected);
-  actionMap.set(CAROUSEL, carousel);
-  actionMap.set(SUGGESTIONS, suggestions);
-  actionMap.set(BYE_CARD, byeCard);
-  actionMap.set(NORMAL_BYE, normalBye);
-  actionMap.set(BYE_RESPONSE, byeResponse);
-  actionMap.set(CARD_BUILDER, cardBuilder);
+  function actionsText (app) {
+    let rawInput = app.getRawInput();
+    console.log('USER SAID ' + rawInput);
+    if (rawInput === 'Basic Card' || rawInput === 'basic card') {
+      basicCard(app);
+    } else if (rawInput === 'List' || rawInput === 'list') {
+      list(app);
+    } else if (rawInput === 'Carousel' || rawInput === 'carousel') {
+      carousel(app);
+    } else if (rawInput === 'normal ask') {
+      normalAsk(app);
+    } else if (rawInput === 'normal bye') {
+      normalBye(app);
+    } else if (rawInput === 'bye card') {
+      byeCard(app);
+    } else if (rawInput === 'bye response') {
+      byeResponse(app);
+    } else if (rawInput === 'Suggestions' || rawInput === 'Suggestion Chips' ||
+               rawInput === 'suggestions' || rawInput === 'suggestions chips') {
+      suggestions(app);
+    } else {
+      normalAsk(app);
+    }
+  }
 
+  const actionMap = new Map();
+  actionMap.set(app.StandardIntents.MAIN, welcome);
+  actionMap.set(app.StandardIntents.TEXT, actionsText);
+  actionMap.set(app.StandardIntents.OPTION, itemSelected);
   app.handleRequest(actionMap);
-};
+});
