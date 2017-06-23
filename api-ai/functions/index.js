@@ -15,6 +15,7 @@
 
 process.env.DEBUG = 'actions-on-google:*';
 let ApiAiApp = require('actions-on-google').ApiAiApp;
+const functions = require('firebase-functions');
 
 // Constants for API.AI Agent Actions
 const NORMAL_ASK = 'normal.ask';
@@ -44,7 +45,7 @@ const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
   '/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png';
 const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 
-exports.conversationComponent = (req, res) => {
+exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new ApiAiApp({request: req, response: res});
   console.log('Request headers: ' + JSON.stringify(req.headers));
   console.log('Request body: ' + JSON.stringify(req.body));
@@ -244,4 +245,4 @@ exports.conversationComponent = (req, res) => {
   actionMap.set(CARD_BUILDER, cardBuilder);
 
   app.handleRequest(actionMap);
-};
+});
