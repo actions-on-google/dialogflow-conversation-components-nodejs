@@ -10,7 +10,7 @@ A simple sample showing the visual conversation components available with Action
 1. Deploy the fulfillment webhook provided in the `functions` folder using [Google Cloud Functions for Firebase](https://firebase.google.com/docs/functions/):
    1. Create a Firebase project in the [Firebase Console](https://console.firebase.google.com) if you don't have one already.
    1. Follow the instructions to [set up and initialize Firebase SDK for Cloud Functions](https://firebase.google.com/docs/functions/get-started#set_up_and_initialize_functions_sdk). Make sure to reply "N" when asked to overwrite existing files by the Firebase CLI.
-   1.Run `firebase deploy --only functions` and take note of the endpoint where the fulfillment webhook has been published. It should look like `Function URL (conversationComponent): https://us-central1-YOUR_PROJECT.cloudfunctions.net/conversationComponent`
+   1. Run `firebase deploy --only functions` and take note of the endpoint where the fulfillment webhook has been published. It should look like `Function URL (conversationComponent): https://us-central1-YOUR_PROJECT.cloudfunctions.net/conversationComponent`
 1. Update the action package, `action.json`, replacing the placeholder value `YOUR_ENDPOINT_URL` with the value for Function URL obtained from the previous step.
 1. [Install the gactions CLI](https://developers.google.com/actions/tools/gactions-cli) if you haven't already.
 1. Go back to the Actions console, copy the command shown in the Actions console, replace `PACKAGE_NAME` with "action.json" and execute it in a shell. The final command should look like `gactions update --action_package action.json --project <YOUR_PROJECT_ID>`
