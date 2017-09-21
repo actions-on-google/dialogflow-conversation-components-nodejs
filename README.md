@@ -17,6 +17,8 @@ A simple sample showing the visual conversation components available with Action
 1. Open the Simulator in the Actions console.
 1. Type "Talk to my test app" in the simulator, or say "OK Google, talk to my test app" to any Actions on Google enabled device signed into your developer account.
 
+For more detailed information on deployment, see the [documentation](https://developers.google.com/actions/sdk/deploy-fulfillment).
+
 ### Steps for API.AI
 1. Use the [Actions on Google Console](https://console.actions.google.com) to add a new project with a name of your choosing.
 1. Click *Use API.AI* and then *Create Actions on API.AI* to open the API.AI console.
@@ -34,7 +36,7 @@ A simple sample showing the visual conversation components available with Action
 1. Click *View* to open the Actions on Google simulator.
 1. Type `Talk to my test app` in the simulator, or say `OK Google, talk to my test app` to any Actions on Google enabled device signed into your developer account.
 
-For more detailed information on deployment, see the [documentation](https://developers.google.com/actions/samples/).
+For more detailed information on deployment, see the [documentation](https://developers.google.com/actions/apiai/deploy-fulfillment).
 
 ## References and How to report bugs
 * Actions on Google documentation: [https://developers.google.com/actions/](https://developers.google.com/actions/).
