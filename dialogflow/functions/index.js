@@ -14,10 +14,10 @@
 'use strict';
 
 process.env.DEBUG = 'actions-on-google:*';
-let ApiAiApp = require('actions-on-google').ApiAiApp;
+const { DialogflowApp } = require('actions-on-google');
 const functions = require('firebase-functions');
 
-// Constants for API.AI Agent Actions
+// Constants for Dialogflow Agent Actions
 const NORMAL_ASK = 'normal.ask';
 const NORMAL_BYE = 'normal.bye';
 const BYE_RESPONSE = 'bye.response';
@@ -46,7 +46,7 @@ const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
 const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
-  const app = new ApiAiApp({request: req, response: res});
+  const app = new DialogflowApp({request: req, response: res});
   console.log('Request headers: ' + JSON.stringify(req.headers));
   console.log('Request body: ' + JSON.stringify(req.body));
 
@@ -198,7 +198,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     }
   }
 
-  // Recive a rich response from API.AI and modify it
+  // Recive a rich response from Dialogflow and modify it
   function cardBuilder (app) {
     app.ask(app.getIncomingRichResponse()
       .addBasicCard(app.buildBasicCard(`Actions on Google let you build for
