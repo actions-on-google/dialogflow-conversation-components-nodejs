@@ -29,6 +29,8 @@ const CAROUSEL = 'carousel';
 const SUGGESTIONS = 'suggestions';
 const ITEM_SELECTED = 'item.selected';
 const CARD_BUILDER = 'card.builder';
+const MEDIA_RESPONSE = 'media.response';
+const MEDIA_STATUS = 'media.status';
 
 // Constants for list and carousel selection
 const SELECTION_KEY_ONE = 'title';
@@ -44,6 +46,11 @@ const IMG_URL_GOOGLE_HOME = 'https://lh3.googleusercontent.com' +
 const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
   '/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png';
 const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
+const IMG_URL_MEDIA = 'http://storage.googleapis.com/automotive-media/album_art.jpg';
+
+const MEDIA_SOURCE = 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3';
+
+const intentSuggestions = ['Basic Card', 'List', 'Carousel', 'Suggestions', 'Media'];
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new DialogflowApp({request: req, response: res});
@@ -59,8 +66,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
           'suggestions on your phone',
         displayText: 'I can show you basic cards, lists and carousels as ' +
           'well as suggestions'})
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']));
+        .addSuggestions(intentSuggestions));
   }
 
   function normalAsk (app) {
@@ -73,7 +79,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
       .buildRichResponse()
       .addSimpleResponse('This is a simple response for suggestions')
       .addSuggestions('Suggestion Chips')
-      .addSuggestions(['Basic Card', 'List', 'Carousel'])
+      .addSuggestions(intentSuggestions)
       .addSuggestionLink('Suggestion Link', 'https://assistant.google.com/'));
   }
 
@@ -81,13 +87,12 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function basicCard (app) {
     app.ask(app.buildRichResponse()
       .addSimpleResponse('This is the first simple response for a basic card')
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions'])
+      .addSuggestions(intentSuggestions)
         // Create a basic card and add it to the rich response
       .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
-      basic card can include "quotes" and most other unicode characters 
-      including emoji 📱.  Basic cards also support some markdown 
-      formatting like *emphasis* or _italics_, **strong** or __bold__, 
+      basic card can include "quotes" and most other unicode characters
+      including emoji 📱.  Basic cards also support some markdown
+      formatting like *emphasis* or _italics_, **strong** or __bold__,
       and ***bold itallic*** or ___strong emphasis___ as well as other things
       like line  \nbreaks`) // Note the two spaces before '\n' required for a
                             // line break to be rendered in the card
@@ -104,8 +109,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function list (app) {
     app.askWithList(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a list')
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']),
+      .addSuggestions(intentSuggestions),
       // Build a list
       app.buildList('List Title')
         // Add the first item to the list
@@ -144,8 +148,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function carousel (app) {
     app.askWithCarousel(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a carousel')
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']),
+      .addSuggestions(intentSuggestions),
       app.buildCarousel()
         // Add the first item to the carousel
         .addItems(app.buildOptionItem(SELECTION_KEY_ONE,
@@ -198,12 +201,37 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     }
   }
 
+  // Media response
+  function mediaResponse (app) {
+    app.ask(app.buildRichResponse()
+      .addSimpleResponse('This is the first simple response for a media response')
+      .addMediaResponse(app.buildMediaResponse()
+        .addMediaObjects(
+          app.buildMediaObject('Jazz in Paris', MEDIA_SOURCE)
+            .setDescription('A funky Jazz tune')
+            .setImage(IMG_URL_MEDIA, app.Media.ImageType.ICON)
+        ))
+      .addSuggestions(intentSuggestions)
+    );
+  }
+
+  // Handle a media status event
+  function mediaStatus (app) {
+    const status = app.getMediaStatus();
+    const simpleResponse = status === app.Media.Status.FINISHED
+      ? 'Hope you enjoyed the tunes!'
+      : 'Unknown media status received.';
+    app.ask(app.buildRichResponse()
+      .addSimpleResponse(simpleResponse)
+      .addSuggestions(intentSuggestions));
+  }
+
   // Recive a rich response from Dialogflow and modify it
   function cardBuilder (app) {
     app.ask(app.getIncomingRichResponse()
       .addBasicCard(app.buildBasicCard(`Actions on Google let you build for
        the Google Assistant. Reach users right when they need you. Users don’t
-       need to pre-enable skills or install new apps.  \n  \nThis was written 
+       need to pre-enable skills or install new apps.  \n  \nThis was written
        in the fulfillment webhook!`)
         .setSubtitle('Engage users through the Google Assistant')
         .setTitle('Actions on Google')
@@ -243,6 +271,8 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   actionMap.set(NORMAL_BYE, normalBye);
   actionMap.set(BYE_RESPONSE, byeResponse);
   actionMap.set(CARD_BUILDER, cardBuilder);
+  actionMap.set(MEDIA_RESPONSE, mediaResponse);
+  actionMap.set(MEDIA_STATUS, mediaStatus);
 
   app.handleRequest(actionMap);
 });

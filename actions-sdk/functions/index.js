@@ -29,8 +29,13 @@ const IMG_URL_AOG = 'https://developers.google.com/actions/images/badges' +
 const IMG_URL_GOOGLE_HOME = 'https://lh3.googleusercontent.com' +
   '/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw';
 const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
-  '/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png';
+  '/Pixel/Pixel_ColorPicker/Pixel_Device_Angledt4t_Black-720w.png';
 const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
+const IMG_URL_MEDIA = 'http://storage.googleapis.com/automotive-media/album_art.jpg';
+
+const MEDIA_SOURCE = 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3';
+
+const intentSuggestions = ['Basic Card', 'List', 'Carousel', 'Suggestions', 'Media'];
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new ActionsSdkApp({request: req, response: res});
@@ -46,12 +51,11 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
           'suggestions on your phone',
         displayText: 'I can show you basic cards, lists and carousels as ' +
           'well as suggestions'})
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']));
+      .addSuggestions(intentSuggestions));
   }
 
   function normalAsk (app) {
-    app.ask('Ask me to show you a list, carousel, or basic card');
+    app.ask('Ask me to show you a list, carousel, basic card, or media.');
   }
 
    // Suggestions
@@ -60,7 +64,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
       .buildRichResponse()
       .addSimpleResponse('This is a simple response for suggestions')
       .addSuggestions('Suggestion Chips')
-      .addSuggestions(['Basic Card', 'List', 'Carousel'])
+      .addSuggestions(intentSuggestions)
       .addSuggestionLink('Suggestion Link', 'https://assistant.google.com/'));
   }
 
@@ -69,12 +73,12 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     app.ask(app.buildRichResponse()
       .addSimpleResponse('This is the first simple response for a basic card')
       .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions'])
+        ['Basic Card', 'List', 'Carousel', 'Suggestions', 'Media'])
         // Create a basic card and add it to the rich response
         .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
-        basic card can include "quotes" and most other unicode characters 
-        including emoji 📱.  Basic cards also support some markdown 
-        formatting like *emphasis* or _italics_, **strong** or __bold__, 
+        basic card can include "quotes" and most other unicode characters
+        including emoji 📱.  Basic cards also support some markdown
+        formatting like *emphasis* or _italics_, **strong** or __bold__,
         and ***bold itallic*** or ___strong emphasis___ as well as other things
         like line  \nbreaks`) // Note the two spaces before '\n' required for a
                               // line break to be rendered in the card
@@ -92,8 +96,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function list (app) {
     app.askWithList(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a list')
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']),
+      .addSuggestions(intentSuggestions),
       // Build a list
       app.buildList('List Title')
         // Add the first item to the list
@@ -132,8 +135,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function carousel (app) {
     app.askWithCarousel(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a carousel')
-      .addSuggestions(
-        ['Basic Card', 'List', 'Carousel', 'Suggestions']),
+      .addSuggestions(intentSuggestions),
       app.buildCarousel()
         // Add the first item to the carousel
         .addItems(app.buildOptionItem(SELECTION_KEY_ONE,
@@ -186,6 +188,31 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     }
   }
 
+  // Media response
+  function mediaResponse (app) {
+    app.ask(app.buildRichResponse()
+      .addSimpleResponse('This is the first simple response for a media response')
+      .addMediaResponse(app.buildMediaResponse()
+        .addMediaObjects(
+          app.buildMediaObject('Jazz in Paris', MEDIA_SOURCE)
+            .setDescription('A funky Jazz tune')
+            .setImage(IMG_URL_MEDIA, app.Media.ImageType.ICON)
+        ))
+      .addSuggestions(intentSuggestions)
+    );
+  }
+
+  // Handle a media status event
+  function mediaStatus (app) {
+    const status = app.getMediaStatus();
+    const simpleResponse = status === app.Media.Status.FINISHED
+      ? 'Hope you enjoyed the tunes!'
+      : 'Unknown media status received.';
+    app.ask(app.buildRichResponse()
+      .addSimpleResponse(simpleResponse)
+      .addSuggestions(intentSuggestions));
+  }
+
   // Leave conversation with card
   function byeCard (app) {
     app.tell(app.buildRichResponse()
@@ -213,6 +240,8 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
       list(app);
     } else if (rawInput === 'Carousel' || rawInput === 'carousel') {
       carousel(app);
+    } else if (rawInput === 'Media' || rawInput === 'media') {
+      mediaResponse(app);
     } else if (rawInput === 'normal ask') {
       normalAsk(app);
     } else if (rawInput === 'normal bye') {
@@ -233,5 +262,6 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   actionMap.set(app.StandardIntents.MAIN, welcome);
   actionMap.set(app.StandardIntents.TEXT, actionsText);
   actionMap.set(app.StandardIntents.OPTION, itemSelected);
+  actionMap.set(app.StandardIntents.MEDIA_STATUS, mediaStatus);
   app.handleRequest(actionMap);
 });
