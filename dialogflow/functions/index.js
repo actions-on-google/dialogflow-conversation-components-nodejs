@@ -18,39 +18,48 @@ const { DialogflowApp } = require('actions-on-google');
 const functions = require('firebase-functions');
 
 // Constants for Dialogflow Agent Actions
-const NORMAL_ASK = 'normal.ask';
-const NORMAL_BYE = 'normal.bye';
-const BYE_RESPONSE = 'bye.response';
-const BYE_CARD = 'bye.card';
-const WELCOME = 'input.welcome';
 const BASIC_CARD = 'basic.card';
-const LIST = 'list';
-const CAROUSEL = 'carousel';
-const SUGGESTIONS = 'suggestions';
-const ITEM_SELECTED = 'item.selected';
+const BROWSE_CAROUSEL = 'browse.carousel';
+const BYE_CARD = 'bye.card';
+const BYE_RESPONSE = 'bye.response';
 const CARD_BUILDER = 'card.builder';
+const CAROUSEL = 'carousel';
+const ITEM_SELECTED = 'item.selected';
+const LIST = 'list';
 const MEDIA_RESPONSE = 'media.response';
 const MEDIA_STATUS = 'media.status';
+const NORMAL_ASK = 'normal.ask';
+const NORMAL_BYE = 'normal.bye';
+const SUGGESTIONS = 'suggestions';
+const WELCOME = 'input.welcome';
 
 // Constants for list and carousel selection
-const SELECTION_KEY_ONE = 'title';
+const SELECTION_KEY_GOOGLE_ALLO = 'googleAllo';
 const SELECTION_KEY_GOOGLE_HOME = 'googleHome';
 const SELECTION_KEY_GOOGLE_PIXEL = 'googlePixel';
-const SELECTION_KEY_GOOGLE_ALLO = 'googleAllo';
+const SELECTION_KEY_ONE = 'title';
 
 // Constant for image URLs
 const IMG_URL_AOG = 'https://developers.google.com/actions/images/badges' +
   '/XPM_BADGING_GoogleAssistant_VER.png';
+const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 const IMG_URL_GOOGLE_HOME = 'https://lh3.googleusercontent.com' +
   '/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw';
 const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
   '/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png';
-const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 const IMG_URL_MEDIA = 'http://storage.googleapis.com/automotive-media/album_art.jpg';
 
 const MEDIA_SOURCE = 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3';
 
-const intentSuggestions = ['Basic Card', 'List', 'Carousel', 'Suggestions', 'Media'];
+const intentSuggestions = [
+    'Basic Card',
+    'Browse Carousel',
+    'Carousel',
+    'List',
+    'Media',
+    'Suggestions'
+];
+
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new DialogflowApp({request: req, response: res});
@@ -182,6 +191,28 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     );
   }
 
+  // Browse Carousel
+  function browseCarousel (app) {
+    const a11yText = 'Google Assistant Bubbles';
+    const googleUrl = 'https://google.com';
+    app.ask(app.buildRichResponse()
+        .addSimpleResponse('This is an example of a "Browse Carousel"')
+        .addBrowseCarousel(
+            app.buildBrowseCarousel()
+            .addItems([
+              app.buildBrowseItem('Title of item 1', googleUrl)
+                .setDescription('Description of item 1')
+                .setImage(IMG_URL_AOG , a11yText)
+                .setFooter('Item 1 footer'),
+              app.buildBrowseItem('Title of item 2', googleUrl)
+                .setDescription('Description of item 2')
+                .setImage(IMG_URL_AOG, a11yText)
+                .setFooter('Item 2 footer')
+            ])
+        )
+    );
+  }
+
   // React to list or carousel selection
   function itemSelected (app) {
     const param = app.getSelectedOption();
@@ -266,6 +297,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   actionMap.set(LIST, list);
   actionMap.set(ITEM_SELECTED, itemSelected);
   actionMap.set(CAROUSEL, carousel);
+  actionMap.set(BROWSE_CAROUSEL, browseCarousel);
   actionMap.set(SUGGESTIONS, suggestions);
   actionMap.set(BYE_CARD, byeCard);
   actionMap.set(NORMAL_BYE, normalBye);

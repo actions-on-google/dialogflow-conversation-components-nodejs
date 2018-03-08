@@ -18,24 +18,31 @@ let ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
 const functions = require('firebase-functions');
 
 // Constants for list and carousel selection
-const SELECTION_KEY_ONE = 'title';
+const SELECTION_KEY_GOOGLE_ALLO = 'googleAllo';
 const SELECTION_KEY_GOOGLE_HOME = 'googleHome';
 const SELECTION_KEY_GOOGLE_PIXEL = 'googlePixel';
-const SELECTION_KEY_GOOGLE_ALLO = 'googleAllo';
+const SELECTION_KEY_ONE = 'title';
 
 // Constant for image URLs
 const IMG_URL_AOG = 'https://developers.google.com/actions/images/badges' +
   '/XPM_BADGING_GoogleAssistant_VER.png';
+const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 const IMG_URL_GOOGLE_HOME = 'https://lh3.googleusercontent.com' +
   '/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw';
 const IMG_URL_GOOGLE_PIXEL = 'https://storage.googleapis.com/madebygoog/v1' +
   '/Pixel/Pixel_ColorPicker/Pixel_Device_Angledt4t_Black-720w.png';
-const IMG_URL_GOOGLE_ALLO = 'https://allo.google.com/images/allo-logo.png';
 const IMG_URL_MEDIA = 'http://storage.googleapis.com/automotive-media/album_art.jpg';
 
 const MEDIA_SOURCE = 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3';
 
-const intentSuggestions = ['Basic Card', 'List', 'Carousel', 'Suggestions', 'Media'];
+const intentSuggestions = [
+    'Basic Card',
+    'Browse Carousel',
+    'Carousel',
+    'List',
+    'Media',
+    'Suggestions'
+];
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new ActionsSdkApp({request: req, response: res});
@@ -169,6 +176,28 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
     );
   }
 
+  // Browse Carousel
+  function browseCarousel (app) {
+    const a11yText = 'Google Assistant Bubbles';
+    const googleUrl = 'https://google.com';
+    app.ask(app.buildRichResponse()
+        .addSimpleResponse('This is an example of a "Browse Carousel"')
+        .addBrowseCarousel(
+          app.buildBrowseCarousel()
+          .addItems([
+            app.buildBrowseItem('Title of item 1', googleUrl)
+              .setDescription('Description of item 1')
+              .setImage(IMG_URL_AOG , a11yText)
+              .setFooter('Item 1 footer'),
+            app.buildBrowseItem('Title of item 2', googleUrl)
+              .setDescription('Description of item 2')
+              .setImage(IMG_URL_AOG, a11yText)
+              .setFooter('Item 2 footer')
+          ])
+        )
+    );
+  }
+
   // React to list or carousel selection
   function itemSelected (app) {
     const param = app.getSelectedOption();
@@ -232,16 +261,18 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   }
 
   function actionsText (app) {
-    let rawInput = app.getRawInput();
+    let rawInput = app.getRawInput().toLowerCase();
     console.log('USER SAID ' + rawInput);
-    if (rawInput === 'Basic Card' || rawInput === 'basic card') {
+    if (rawInput === 'basic card') {
       basicCard(app);
-    } else if (rawInput === 'List' || rawInput === 'list') {
+    } else if (rawInput === 'list') {
       list(app);
-    } else if (rawInput === 'Carousel' || rawInput === 'carousel') {
+    } else if (rawInput === 'carousel') {
       carousel(app);
-    } else if (rawInput === 'Media' || rawInput === 'media') {
+    } else if (rawInput === 'media') {
       mediaResponse(app);
+    } else if (rawInput === 'browse carousel') {
+      browseCarousel(app);
     } else if (rawInput === 'normal ask') {
       normalAsk(app);
     } else if (rawInput === 'normal bye') {
@@ -250,8 +281,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
       byeCard(app);
     } else if (rawInput === 'bye response') {
       byeResponse(app);
-    } else if (rawInput === 'Suggestions' || rawInput === 'Suggestion Chips' ||
-               rawInput === 'suggestions' || rawInput === 'suggestions chips') {
+    } else if (rawInput === 'suggestions' || rawInput === 'suggestions chips') {
       suggestions(app);
     } else {
       normalAsk(app);
