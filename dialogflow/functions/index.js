@@ -52,19 +52,21 @@ const IMG_URL_MEDIA = 'http://storage.googleapis.com/automotive-media/album_art.
 const MEDIA_SOURCE = 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3';
 
 const intentSuggestions = [
-    'Basic Card',
-    'Browse Carousel',
-    'Carousel',
-    'List',
-    'Media',
-    'Suggestions'
+  'Basic Card',
+  'Browse Carousel',
+  'Carousel',
+  'List',
+  'Media',
+  'Suggestions'
 ];
-
 
 exports.conversationComponent = functions.https.onRequest((req, res) => {
   const app = new DialogflowApp({request: req, response: res});
   console.log('Request headers: ' + JSON.stringify(req.headers));
   console.log('Request body: ' + JSON.stringify(req.body));
+
+  const hasScreen = app.hasSurfaceCapability(app.SurfaceCapabilities.SCREEN_OUTPUT);
+  const hasAudioPlayback = app.hasSurfaceCapability(app.SurfaceCapabilities.MEDIA_RESPONSE_AUDIO);
 
   // Welcome
   function welcome (app) {
@@ -84,6 +86,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
    // Suggestions
   function suggestions (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.ask(app
       .buildRichResponse()
       .addSimpleResponse('This is a simple response for suggestions')
@@ -94,6 +100,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // Basic card
   function basicCard (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.ask(app.buildRichResponse()
       .addSimpleResponse('This is the first simple response for a basic card')
       .addSuggestions(intentSuggestions)
@@ -116,6 +126,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // List
   function list (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.askWithList(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a list')
       .addSuggestions(intentSuggestions),
@@ -155,6 +169,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // Carousel
   function carousel (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.askWithCarousel(app.buildRichResponse()
       .addSimpleResponse('This is a simple response for a carousel')
       .addSuggestions(intentSuggestions),
@@ -195,6 +213,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
   function browseCarousel (app) {
     const a11yText = 'Google Assistant Bubbles';
     const googleUrl = 'https://google.com';
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.ask(app.buildRichResponse()
         .addSimpleResponse('This is an example of a "Browse Carousel"')
         .addBrowseCarousel(
@@ -202,7 +224,7 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
             .addItems([
               app.buildBrowseItem('Title of item 1', googleUrl)
                 .setDescription('Description of item 1')
-                .setImage(IMG_URL_AOG , a11yText)
+                .setImage(IMG_URL_AOG, a11yText)
                 .setFooter('Item 1 footer'),
               app.buildBrowseItem('Title of item 2', googleUrl)
                 .setDescription('Description of item 2')
@@ -234,6 +256,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // Media response
   function mediaResponse (app) {
+    if (!hasAudioPlayback) {
+      app.ask('Sorry, this device does not support audio playback.');
+      return;
+    }
     app.ask(app.buildRichResponse()
       .addSimpleResponse('This is the first simple response for a media response')
       .addMediaResponse(app.buildMediaResponse()
@@ -259,6 +285,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // Recive a rich response from Dialogflow and modify it
   function cardBuilder (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.ask(app.getIncomingRichResponse()
       .addBasicCard(app.buildBasicCard(`Actions on Google let you build for
        the Google Assistant. Reach users right when they need you. Users don’t
@@ -274,6 +304,10 @@ exports.conversationComponent = functions.https.onRequest((req, res) => {
 
   // Leave conversation with card
   function byeCard (app) {
+    if (!hasScreen) {
+      app.ask('Sorry, try this on a screen device or select the phone surface in the simulator');
+      return;
+    }
     app.tell(app.buildRichResponse()
       .addSimpleResponse('Goodbye, World!')
       .addBasicCard(app.buildBasicCard('This is a goodbye card.')));
