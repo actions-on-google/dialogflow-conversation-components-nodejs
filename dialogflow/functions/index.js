@@ -26,6 +26,7 @@ const {
   MediaObject,
   Suggestions,
   SimpleResponse,
+  Table,
  } = require('actions-on-google');
 const functions = require('firebase-functions');
 
@@ -62,6 +63,7 @@ const intentSuggestions = [
   'List',
   'Media',
   'Suggestions',
+  'Table',
 ];
 
 const app = dialogflow({debug: true});
@@ -385,6 +387,23 @@ app.intent('card builder', (conv) => {
       url: IMG_URL_AOG,
       alt: 'Actions on Google',
     }),
+  }));
+});
+
+app.intent('table builder', (conv) => {
+  if (!conv.hasScreen) {
+    conv.ask('Sorry, try this on a screen device or select the ' +
+      'phone surface in the simulator.');
+    return;
+  }
+  conv.ask('You can include table data like this')
+  conv.ask(new Table({
+    dividers: true,
+    columns: ['header 1', 'header 2', 'header 3'],
+    rows: [
+      ['row 1 item 1', 'row 1 item 2', 'row 1 item 3'],
+      ['row 2 item 1', 'row 2 item 2', 'row 2 item 3'],
+    ],
   }));
 });
 
