@@ -322,6 +322,7 @@ app.intent('browse carousel', (conv) => {
       }),
     ],
   }));
+  conv.ask(new Suggestions(intentSuggestions));
 });
 
 // Media response
