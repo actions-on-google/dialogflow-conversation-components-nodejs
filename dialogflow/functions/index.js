@@ -410,7 +410,7 @@ app.intent('table builder', (conv) => {
 
 // Leave conversation with card
 app.intent('bye card', (conv) => {
-  if (!hasScreen) {
+  if (!conv.hasScreen) {
     conv.ask('Sorry, try this on a screen device or select the phone ' +
       'surface in the simulator.');
     return;
