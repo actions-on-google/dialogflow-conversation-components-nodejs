@@ -1,50 +1,59 @@
 # Actions on Google: Dialogflow Conversation Components Sample
 
-A simple sample showing the visual conversation components available with Actions on Google.
+A sample featuring rich responses for building Actions on the Google Assistant while using the [Node.js client library](https://github.com/actions-on-google/actions-on-google-nodejs) and deployed on [Cloud Functions for Firebase](https://firebase.google.com/docs/functions/).
 
-## Setup Instructions
+## Setup
 
-Choose one of the two options listed below for setup. You only need to complete one of the two options below to setup this sample.
+Select **only one** of the options below.
 
-#### Option 1: Add to Dialogflow (recommended)
-Click on the **Add to Dialogflow** button below and follow the prompts to create a new agent:
+### Option 1: Add to Dialogflow
+To create agent from our template:
 
 [![Conversation Component](https://storage.googleapis.com/dialogflow-oneclick/deploy.svg "Conversation Component")](https://console.dialogflow.com/api-client/oneclick?templateUrl=https%3A%2F%2Fstorage.googleapis.com%2Fdialogflow-oneclick%2Frich-response-agent.zip&agentName=ActionsOnGoogleRichResponsesSample)
 
-#### Option 2: Dialogflow restore and Firebase CLI
-1. Use the [Actions on Google Console](https://console.actions.google.com) to add a new project with a name of your choosing and click *Create Project*.
-1. Scroll down to the *More Options* section, and click on the *Conversational* card.
-1. On the left navigation menu under *BUILD*, click on *Actions*. Click on *Add Your First Action* and choose your app's language(s).
-1. Select *Custom intent*, click *BUILD*. This will open a Dialogflow console. Click *CREATE*.
-1. Click on the gear icon to see the project settings.
-1. Select *Export and Import*.
-1. Select *Restore from zip*. Follow the directions to restore from the `agent.zip` file in this repo.
-1. Deploy the fulfillment webhook provided in the `functions` folder using [Google Cloud Functions for Firebase](https://firebase.google.com/docs/functions/):
-   1. Create a Firebase project in the [Firebase Console](https://console.firebase.google.com) if you don't have one already.
-   1. Follow the instructions to [set up and initialize Firebase SDK for Cloud Functions](https://firebase.google.com/docs/functions/get-started#set_up_and_initialize_functions_sdk). Make sure to reply "N" when asked to overwrite existing files by the Firebase CLI.
-   1.Run `firebase deploy --only functions` and take note of the endpoint where the fulfillment webhook has been published. It should look like `Function URL (conversationComponent): https://us-central1-YOUR_PROJECT.cloudfunctions.net/conversationComponent`
-1. Go back to the Dialogflow console and select *Fulfillment* from the left navigation menu. Enable *Webhook*, set the value of *URL* to the `Function URL` from the previous step, then click *Save*.
+### Option 2: Dialogflow Restore and Firebase CLI
 
-### Test on the Actions on Google simulator
-1. Select [*Integrations*](https://console.dialogflow.com/api-client/#/agent//integrations) from the left navigation menu and open the *Settings* menu for Actions on Google.
-1. Enable *Auto-preview changes* and Click *Test*. This will open the Actions on Google simulator.
-1. Type `Talk to my test app` in the simulator, or say `OK Google, talk to my test app` to any Actions on Google enabled device signed into your developer account.
+### Prerequisites
+1. Node.js and NPM
+    + We recommend installing using [NVM](https://github.com/creationix/nvm)
+1. Install the [Firebase CLI](https://developers.google.com/actions/dialogflow/deploy-fulfillment)
+    + We recommend using version 6.5.0, `npm install -g firebase-tools@6.5.0`
+    + Run `firebase login` with your Google account
 
-For more detailed information on deployment, see the [documentation](https://developers.google.com/actions/dialogflow/deploy-fulfillment).
+### Configuration
+#### Actions console
+1. From the [Actions on Google Console](https://console.actions.google.com/), add a new project > **Create Project** > under **More options** > **Conversational**
+1. From the left navigation menu under **Build** > **Actions** > **Add Your First Action** > **BUILD** (this will bring you to the Dialogflow console) > Select language and time zone > **CREATE**.
+1. In the Dialogflow console, go to **Settings** ⚙ > **Export and Import** > **Restore from zip** using the `agent.zip` in this sample's directory.
 
-## References and How to report bugs
-* Actions on Google documentation: [https://developers.google.com/actions/](https://developers.google.com/actions/).
-* If you find any issues, please open a bug here on GitHub.
-* Questions are answered on [StackOverflow](https://stackoverflow.com/questions/tagged/actions-on-google).
+#### Local machine
+1. In the `functions` directory, run `npm install`
+1. Run `firebase deploy --project {PROJECT_ID}` to deploy the function
+    + To find your **Project ID**: In [Dialogflow console](https://console.dialogflow.com/) under **Settings** ⚙ > **General** tab > **Project ID**.
 
-## How to make contributions?
+#### Dialogflow console
+1. Return to the [Dialogflow Console](https://console.dialogflow.com) > select **Fulfillment** > **Enable** Webhook > Set **URL** to the **Function URL** that was returned after the deploy command > **SAVE**.
+    ```
+    Function URL (dialogflowFirebaseFulfillment): https://<REGION>-<PROJECT_ID>.cloudfunctions.net/dialogflowFirebaseFulfillment
+    ```
+1. From the left navigation menu, click **Integrations** > **Integration Settings** under Google Assistant > Enable **Auto-preview changes** >  **Test** to open the Actions on Google simulator then say or type `Talk to my test app`.
+
+### Testing this Sample
++ (Recommended) Open up the Assistant app then say or type `OK Google, talk to my test app` on a mobile device where Google Assistant is associated with the same account as your Action.
++ You can also use the Actions on Google Console simulator to test most features and preview on-device behavior.
+
+## References & Issues
++ Questions? Go to [StackOverflow](https://stackoverflow.com/questions/tagged/actions-on-google), [Assistant Developer Community on Reddit](https://www.reddit.com/r/GoogleAssistantDev/) or [Support](https://developers.google.com/actions/support/).
++ For bugs, please report an issue on Github.
++ Actions on Google [Documentation](https://developers.google.com/actions/extending-the-assistant)
++ Actions on Google [Codelabs](https://codelabs.developers.google.com/?cat=Assistant).
++ [Webhook Boilerplate Template](https://github.com/actions-on-google/dialogflow-webhook-boilerplate-nodejs) for Actions on Google.
+
+### Make Contributions
 Please read and follow the steps in the [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## License
+### License
 See [LICENSE](LICENSE).
 
-## Terms
+### Terms
 Your use of this sample is subject to, and by using or downloading the sample files you agree to comply with, the [Google APIs Terms of Service](https://developers.google.com/terms/).
-
-## Google+
-Actions on Google Developers Community on Google+ [https://g.co/actionsdev](https://g.co/actionsdev).
