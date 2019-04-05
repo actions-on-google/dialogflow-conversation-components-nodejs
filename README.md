@@ -21,17 +21,17 @@ To create agent from our template:
     + Run `firebase login` with your Google account
 
 ### Configuration
-#### Actions console
+#### Actions Console
 1. From the [Actions on Google Console](https://console.actions.google.com/), add a new project > **Create Project** > under **More options** > **Conversational**
 1. From the left navigation menu under **Build** > **Actions** > **Add Your First Action** > **BUILD** (this will bring you to the Dialogflow console) > Select language and time zone > **CREATE**.
 1. In the Dialogflow console, go to **Settings** ⚙ > **Export and Import** > **Restore from zip** using the `agent.zip` in this sample's directory.
 
-#### Local machine
-1. In the `functions` directory, run `npm install`
+#### Firebase Deployment
+1. On your local machine, in the `functions` directory, run `npm install`
 1. Run `firebase deploy --project {PROJECT_ID}` to deploy the function
     + To find your **Project ID**: In [Dialogflow console](https://console.dialogflow.com/) under **Settings** ⚙ > **General** tab > **Project ID**.
 
-#### Dialogflow console
+#### Dialogflow Console
 1. Return to the [Dialogflow Console](https://console.dialogflow.com) > select **Fulfillment** > **Enable** Webhook > Set **URL** to the **Function URL** that was returned after the deploy command > **SAVE**.
     ```
     Function URL (dialogflowFirebaseFulfillment): https://<REGION>-<PROJECT_ID>.cloudfunctions.net/dialogflowFirebaseFulfillment
