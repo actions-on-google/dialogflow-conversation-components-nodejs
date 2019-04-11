@@ -33,21 +33,21 @@ const functions = require('firebase-functions');
 // Constants for list and carousel selection
 const SELECTION_KEY_GOOGLE_ASSISTANT = 'googleAssistant';
 const SELECTION_KEY_GOOGLE_PAY = 'googlePay';
-const SELECTION_KEY_GOOGLE_MAPS = 'googleMaps';
-const SELECTION_KEY_GOOGLE_FLUTTER = 'googleFlutter';
+const SELECTION_KEY_GOOGLE_PIXEL = 'googlePixel';
+const SELECTION_KEY_GOOGLE_HOME = 'googleHome';
 
 // Constant for image URLs
 const IMG_URL_AOG = 'https://storage.googleapis.com/actionsresources/logo_assistant_2x_64dp.png';
 const IMG_URL_GOOGLE_PAY = 'https://storage.googleapis.com/actionsresources/logo_pay_64dp.png';
-const IMG_URL_GOOGLE_MAPS = 'https://storage.googleapis.com/actionsresources/logo_maps_2x_64dp.png';
-const IMG_URL_GOOGLE_FLUTTER ='https://storage.googleapis.com/actionsresources/logo_flutter_2x_64dp.png';
+const IMG_URL_GOOGLE_PIXEL = "https://storage.googleapis.com/madebygoog/v1/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png";
+const IMG_URL_GOOGLE_HOME = "https://lh3.googleusercontent.com/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw";
 
 // Constants for selected item responses
 const SELECTED_ITEM_RESPONSES = {
   [SELECTION_KEY_GOOGLE_ASSISTANT]: 'You selected Google Assistant!',
   [SELECTION_KEY_GOOGLE_PAY]: 'You selected Google Pay!',
-  [SELECTION_KEY_GOOGLE_MAPS]: 'You selected Google Maps!',
-  [SELECTION_KEY_GOOGLE_FLUTTER]: 'You selected Google Flutter!',
+  [SELECTION_KEY_GOOGLE_PIXEL]: 'You selected Google Pixel!',
+  [SELECTION_KEY_GOOGLE_HOME]: 'You selected Google Home!',
 };
 
 const intentSuggestions = [
@@ -69,18 +69,21 @@ app.middleware((conv) => {
     conv.surface.capabilities.has('actions.capability.AUDIO_OUTPUT');
   conv.hasWebBrowser =
     conv.surface.capabilities.has('actions.capability.WEB_BROWSER');
+
+  // All require this surface capability check except for media responses
+  if (!conv.hasScreen && (conv.intent !== 'media response' || 'media status')) {
+    conv.ask(`Hi there! Sorry, I'm afraid you'll have to switch to a ` +
+      `screen device or select the phone surface in the simulator.`);
+    return;
+  }
 });
 
 app.intent('Default Welcome Intent', (conv) => {
   conv.ask(new SimpleResponse({
-    speech: 'Hi there!',
-    text: 'Hello there!',
-  }));
-  conv.ask(new SimpleResponse({
-    speech: 'I can show you basic cards, lists and carousels ' +
-      'as well as suggestions on your phone.',
-    text: 'I can show you basic cards, lists and carousels as ' +
-      'well as suggestions.',
+    speech: 'I can show you basic cards, lists, and more ' +
+      'on your phone and smart display.',
+    text: 'I can show you basic cards, lists, and more ' +
+      'on your phone and smart display.',
   }));
   conv.ask(new Suggestions(intentSuggestions));
 });
@@ -91,13 +94,7 @@ app.intent('normal ask', (conv) => {
 
 // Suggestions
 app.intent('suggestions', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
-  conv.ask('This is a simple response for suggestions.');
-  conv.ask(new Suggestions('Suggestion Chips'));
+  conv.ask('This is an example of suggestion chips.');
   conv.ask(new Suggestions(intentSuggestions));
   conv.ask(new LinkOutSuggestion({
     name: 'Suggestion Link',
@@ -107,14 +104,8 @@ app.intent('suggestions', (conv) => {
 
 // Basic card
 app.intent('basic card', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
   conv.ask('This is the first simple response for a basic card.');
   conv.ask(new Suggestions(intentSuggestions));
-  // Create a basic card
   conv.ask(new BasicCard({
     text: `This is a basic card.  Text in a basic card can include "quotes" and
     most other unicode characters including emoji 📱.  Basic cards also support
@@ -141,14 +132,8 @@ app.intent('basic card', (conv) => {
 
 // List
 app.intent('list', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
-  conv.ask('This is a simple response for a list.');
+  conv.ask('This is an example of a list.');
   conv.ask(new Suggestions(intentSuggestions));
-  // Create a list
   conv.ask(new List({
     title: 'List Title',
     items: {
@@ -158,8 +143,8 @@ app.intent('list', (conv) => {
           'Assistant',
           'Google Assistant',
         ],
-        title: 'Google and Assistant',
-        description: 'Build Actions for Google Assistant.',
+        title: 'Item #1',
+        description: 'Description of Item #1',
         image: new Image({
           url: 'https://www.gstatic.com/images/branding/product/2x/assistant_48dp.png',
           alt: 'Google Assistant logo',
@@ -170,39 +155,40 @@ app.intent('list', (conv) => {
         synonyms: [
           'Transactions',
           'Google Payments',
-          'Transactions API',
+          'Google Pay',
       ],
-        title: 'Monetize',
-        description: 'Use Google Pay in your Action.',
+        title: 'Item #2',
+        description: 'Description of Item #2',
         image: new Image({
           url: 'https://www.gstatic.com/images/branding/product/2x/pay_48dp.png',
           alt: 'Google Pay logo',
         }),
       },
       // Add the third item to the list
-      [SELECTION_KEY_GOOGLE_MAPS]: {
+      [SELECTION_KEY_GOOGLE_PIXEL]: {
         synonyms: [
-          'Google Maps',
-          'Maps',
-          'Google Maps API',
+          'Pixel',
+          'Google Pixel',
+          'Pixel phone'
         ],
-        title: 'Google Maps',
-        description: 'Maps by Google.',
+        title: 'Item #3',
+        description: 'Description of Item #3',
         image: new Image({
-          url: 'https://www.gstatic.com/images/branding/product/2x/maps_48dp.png',
-          alt: 'Google Maps logo',
+          url: 'https://storage.googleapis.com/madebygoog/v1/Pixel/Pixel_ColorPicker/Pixel_Device_Angled_Black-720w.png',
+          alt: 'Google Pixel phone',
         }),
       },
       // Add the last item to the list
-      [SELECTION_KEY_GOOGLE_FLUTTER]: {
-        title: 'Google Flutter',
+      [SELECTION_KEY_GOOGLE_HOME]: {
+        title: 'Item #4',
         synonyms: [
-          'Flutter',
+          'Home',
+          'Google Home',
         ],
-        description: 'Introducing Google Flutter for iOS and Android development.',
+        description: 'Description of Item #4',
         image: new Image({
-          url: 'https://www.gstatic.com/images/branding/product/2x/flutter_48dp.png',
-          alt: 'Google Flutter logo',
+          url: 'https://lh3.googleusercontent.com/Nu3a6F80WfixUqf_ec_vgXy_c0-0r4VLJRXjVFF_X_CIilEu8B9fT35qyTEj_PEsKw',
+          alt: 'Google Home',
         }),
       },
     },
@@ -211,14 +197,8 @@ app.intent('list', (conv) => {
 
 // Carousel
 app.intent('carousel', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
-  conv.ask('This is a simple response for a carousel.');
+  conv.ask('This is an example of a carousel.');
   conv.ask(new Suggestions(intentSuggestions));
-  // Create a carousel
   conv.ask(new Carousel({
     items: {
       // Add the first item to the carousel
@@ -227,8 +207,8 @@ app.intent('carousel', (conv) => {
           'Assistant',
           'Google Assistant',
         ],
-        title: 'Google Assistant',
-        description: 'Build Actions for Google Assistant.',
+        title: 'Item #1',
+        description: 'Description of Item #1',
         image: new Image({
           url: IMG_URL_AOG,
           alt: 'Google Assistant logo',
@@ -239,39 +219,37 @@ app.intent('carousel', (conv) => {
         synonyms: [
           'Transactions',
           'Google Payments',
-          'Transactions API',
       ],
-        title: 'Google Pay',
-        description: 'Use Google Pay in your Action with Transactions API.',
+        title: 'Item #2',
+        description: 'Description of Item #2',
         image: new Image({
           url: IMG_URL_GOOGLE_PAY,
           alt: 'Google Pay logo',
         }),
       },
       // Add third item to the carousel
-      [SELECTION_KEY_GOOGLE_MAPS]: {
+      [SELECTION_KEY_GOOGLE_PIXEL]: {
         synonyms: [
-          'Google Maps',
-          'Maps',
-          'Google Maps APIs'
+          'Pixel',
+          'Google Pixel phone',
         ],
-        title: 'Google Maps',
-        description: 'Maps by Google.',
+        title: 'Item #3',
+        description: 'Description of Item #3',
         image: new Image({
-          url: IMG_URL_GOOGLE_MAPS,
-          alt: 'Google Maps logo',
+          url: IMG_URL_GOOGLE_PIXEL,
+          alt: 'Google Pixel phone',
         }),
       },
       // Add last item of the carousel
-      [SELECTION_KEY_GOOGLE_FLUTTER]: {
-        title: 'Google Flutter',
+      [SELECTION_KEY_GOOGLE_HOME]: {
+        title: 'Item #4',
         synonyms: [
-          'Flutter',
+          'Google Home',
         ],
-        description: 'Introducing Google Flutter for iOS and Android development.',
+        description: 'Description of Item #4',
         image: new Image({
-          url: IMG_URL_GOOGLE_FLUTTER,
-          alt: 'Google Flutter logo',
+          url: IMG_URL_GOOGLE_HOME,
+          alt: 'Google Home',
         }),
       },
     },
@@ -280,24 +258,20 @@ app.intent('carousel', (conv) => {
 
 // Browse Carousel
 app.intent('browse carousel', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a mobile device or select the ' +
-      'phone surface in the simulator.');
+  // Browse Carousel requires browser access
+  if (!conv.hasWebBrowser) {
+    conv.ask(`I'm sorry, browse carousel isn't currently supported on smart display`);
+    const filterChips = intentSuggestions.filter(chip => chip !="Browse Carousel");
+    conv.ask(new Suggestions(filterChips));
     return;
   }
-
-  if (!conv.hasWebBrowser) {
-    conv.ask(`I'm sorry, browse carousel isn't supported on smart display`);
-  }
-
   conv.ask('This is an example of a "Browse Carousel"');
-  // Create a browse carousel
   conv.ask(new BrowseCarousel({
     items: [
       new BrowseCarouselItem({
-        title: 'Actions on Assistant',
+        title: 'Item #1',
         url: 'https://assistant.google.com/',
-        description: 'Build Actions for Google Assistant.',
+        description: 'Description of Item #1',
         image: new Image({
           url: 'https://www.gstatic.com/images/branding/product/2x/assistant_64dp.png',
           alt: 'Google Assistant logo',
@@ -305,9 +279,9 @@ app.intent('browse carousel', (conv) => {
         footer: 'Item 1 footer',
       }),
       new BrowseCarouselItem({
-        title: 'Google Pay',
+        title: 'Item #2',
         url: 'https://developers.google.com/actions/transactions/physical/dev-guide-physical-gpay',
-        description: 'Use Google Pay in your Action with Transactions API.',
+        description: 'Description of Item #2',
         image: new Image({
           url: 'https://www.gstatic.com/images/branding/product/2x/pay_64dp.png',
           alt: 'Google Pay logo',
@@ -321,6 +295,7 @@ app.intent('browse carousel', (conv) => {
 
 // Media response
 app.intent('media response', (conv) => {
+  // Media responses require audio playback
   if (!conv.hasAudioPlayback) {
     conv.close('Sorry, this device does not support audio playback.');
     return;
@@ -328,10 +303,10 @@ app.intent('media response', (conv) => {
   conv.ask('This is the first simple response for a media response');
   conv.ask(new MediaObject({
     name: 'Jazz in Paris',
-    url: 'http://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3',
+    url: 'https://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3',
     description: 'A funky Jazz tune',
     icon: new Image({
-      url: 'http://storage.googleapis.com/automotive-media/album_art.jpg',
+      url: 'https://storage.googleapis.com/automotive-media/album_art.jpg',
       alt: 'Media icon',
     }),
   }));
@@ -358,14 +333,10 @@ app.intent('item selected', (conv, params, option) => {
     response = 'You selected an unknown item from the list or carousel';
   }
   conv.ask(response);
+  conv.ask(new Suggestions(intentSuggestions));
 });
 
 app.intent('card builder', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
   conv.ask(...conv.incoming);
   conv.ask(new BasicCard({
     text: `Actions on Google let you build for
@@ -386,11 +357,6 @@ app.intent('card builder', (conv) => {
 });
 
 app.intent('table builder', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the ' +
-      'phone surface in the simulator.');
-    return;
-  }
   conv.ask('You can include table data like this')
   conv.ask(new Table({
     dividers: true,
@@ -405,11 +371,6 @@ app.intent('table builder', (conv) => {
 
 // Leave conversation with card
 app.intent('bye card', (conv) => {
-  if (!conv.hasScreen) {
-    conv.ask('Sorry, try this on a screen device or select the phone ' +
-      'surface in the simulator.');
-    return;
-  }
   conv.ask('Goodbye, World!');
   conv.close(new BasicCard({
     text: 'This is a goodbye card.',
