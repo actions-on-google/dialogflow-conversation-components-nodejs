@@ -22,7 +22,7 @@ To create agent from our template:
 
 ### Configuration
 #### Actions Console
-1. From the [Actions on Google Console](https://console.actions.google.com/), add a new project > **Create Project** > under **More options** > **Conversational**
+1. From the [Actions on Google Console](https://console.actions.google.com/), New project (this will be your *Project ID*) > **Create Project** > under **More options** > **Conversational**
 1. From the top menu under **Develop** > **Actions** (left nav) > **Add your first action** > **BUILD** (this will bring you to the Dialogflow console) > Select language and time zone > **CREATE**.
 1. In the Dialogflow console, go to **Settings** ⚙ > **Export and Import** > **Restore from zip** using the `agent.zip` in this sample's directory.
 
